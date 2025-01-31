@@ -62,7 +62,7 @@ pipeline {
                         // Run Ansible playbook and pass BUILD_ID as an extra variable
                         sh """
                             ssh root@192.168.126.129 '
-                                ansible-playbook /home/ansible/datafromjenkinserver/your-playbook.yml -e BUILD_ID=${BUILD_ID}
+                                ansible-playbook /home/ansible/datafromjenkinserver/playbook.yaml -e BUILD_ID=${BUILD_ID}
                             '
                         """
                     }
