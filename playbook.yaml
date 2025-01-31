@@ -1,0 +1,9 @@
+---
+- name: "First Playbook"
+  hosts: dockerhost
+  tasks: 
+    - name: "Pull the image from Docker Hub"
+      shell: "docker pull amitkumar0441/jenkins-ansible-docker:{{ BUILD_ID }}"
+
+    - name: "Run the container"
+      shell: "docker run -d --name simplewebappcontainer -p 30789:80 amitkumar0441/jenkins-ansible-docker:{{ BUILD_ID }}"

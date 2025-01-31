@@ -28,8 +28,7 @@ pipeline {
                         sh """
                             ssh root@192.168.126.129 '
                                 cd /home/ansible/datafromjenkinserver &&
-                                docker build -t amitkumar0441/jenkins-ansible-docker:${BUILD_ID} .
-                            '
+                                docker build -t amitkumar0441/jenkins-ansible-docker:${BUILD_ID} .'
                         """
                     }
                 }
@@ -44,12 +43,28 @@ pipeline {
                             // Corrected multi-line SSH command with docker rmi added
                             sh """
                                 ssh root@192.168.126.129 "
-                                    docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD &&
+                                    docker login -u '${DOCKER_USERNAME}' -p '${DOCKER_PASSWORD}' &&
                                     docker push amitkumar0441/jenkins-ansible-docker:${BUILD_ID} &&
+                                    docker logout &&
                                     docker rmi amitkumar0441/jenkins-ansible-docker:${BUILD_ID}
                                 "
                             """
                         }
+                    }
+                }
+            }
+        }
+
+        stage('Stage 05 - Run Playbook on Ansible Server') {
+            steps {
+                sshagent(['ansible_server']) {
+                    script {
+                        // Run Ansible playbook and pass BUILD_ID as an extra variable
+                        sh """
+                            ssh root@192.168.126.129 '
+                                ansible-playbook /home/ansible/datafromjenkinserver/your-playbook.yml -e BUILD_ID=${BUILD_ID}
+                            '
+                        """
                     }
                 }
             }
