@@ -1,11 +1,6 @@
 pipeline {
     agent any 
 
-    environment {
-        // Define the Jenkins build ID as a build variable
-        BUILD_ID = "${env.BUILD_ID}"
-    }
-
     stages {
         stage('Stage 01 - Clean the Workspace') {
             steps {
@@ -24,8 +19,8 @@ pipeline {
                         // Create the directory on the Ansible server
                         sh "ssh root@192.168.126.129 'mkdir -p /home/ansible/datafromjenkinserver'"
 
-                        // Copy all files from Jenkins workspace to the Ansible server
-                        sh "scp -r * root@192.168.126.129:/home/ansible/datafromjenkinserver/"
+                        // Copy all files from Jenkins workspace to the Ansible server, excluding Jenkinsfile
+                        sh "rsync -av --exclude='Jenkinsfile' ./ root@192.168.126.129:/home/ansible/datafromjenkinserver/"
 
                         // Build the Docker image using the transferred files (directly on Ansible server)
                         sh """
@@ -33,10 +28,10 @@ pipeline {
                                 cd /home/ansible/datafromjenkinserver &&
                                 docker build -t amitkumar0441/jenkins-ansible-docker:${BUILD_ID} .'
                         """
+                        sh " docker push amitkumar0441/jenkins-ansible-docker:${BUILD_ID}"
                     }
                 }
             }
         }
     }
 }
-
