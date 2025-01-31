@@ -41,11 +41,12 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'dockercredentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                     sshagent(['ansible_server']) {
                         script {
+                            // Use environment variables to pass credentials securely
                             sh """
-                                ssh root@192.168.126.129 '
+                                ssh root@192.168.126.129 <<EOF
                                     docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD" &&
-                                    docker push amitkumar0441/jenkins-ansible-docker:${BUILD_ID}"
-                                '
+                                    docker push amitkumar0441/jenkins-ansible-docker:${BUILD_ID}
+                                EOF
                             """
                         }
                     }
